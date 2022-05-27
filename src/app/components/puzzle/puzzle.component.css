@@ -1,0 +1,8 @@
+.canvasR{
+    border: 1px solid black;
+    background-color: #353232;
+    margin:0;
+    overflow: hidden;
+    width: 100%;
+    overscroll-behavior: none;  
+}

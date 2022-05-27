@@ -1,0 +1,25 @@
+<div class="container">
+    <h5>Seleccione una imagen para crear su sala</h5>
+    <br>
+    <div class="row-2">
+    <input (change)="upload($event)" type="file">
+</div>
+<!-- <div >
+    <button type="button" class="btn btn-success" (click)="uploadImg()" >Subir archivo</button>
+ </div> -->
+ <hr>
+ <div class="controls">
+    <form (ngSubmit)="uploadImg(forma)" #forma="ngForm">
+    <h3>Dificultad</h3> <select ngModel class="form-select" name="difficulty">
+            <option value="easy">Facilito</option>
+            <option value="medium">Medio</option>
+            <option value="hard">Dificil</option>
+            <option value="insane">Imposiblee</option>
+     </select>
+     <br>
+     <h6>Una vez seleccionado todo inicie ;D</h6>
+     <hr>
+     <button type="submit" class="btn btn-success" >Iniciar la Sala</button>
+    </form> 
+ </div>
+</div>
