@@ -87,7 +87,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     
     this.context.globalAlpha=1;
     for(let i=0;i<this.pieces.length;i++){
-      this.pieces[i].draw(this.context,this.imageObj,this.size);
+      this.pieces[i].draw(this.context,this.imageObj,this.size,);
     }
     window.requestAnimationFrame(() => this.drawImage() );    
   }
