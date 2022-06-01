@@ -3,14 +3,14 @@ const express = require('express');
 const app = express();
 
 // From package.json (name)
-const projectName = 'puzzlefrontend';
+const projectName = 'puzzle';
 
 // Serve static files
-app.use(express.static(`${__dirname}/dist/${projectName}`));
+app.use(express.static('./dist/' + projectName));
 
 // Send all requests to index.html
 app.get('/*', function (req, res) {
-    res.sendFile(path.join(`${__dirname}/dist/${projectName}/index.html`));
+    res.sendFile('index.html', { root: 'dist/' + projectName });
 });
 
 // default Heroku port
