@@ -20,13 +20,14 @@ const routes: Routes = [
     component:HomeComponent
   },
   {
-    path:'room',
+    path:':room',
     component: RoomComponent
   },
   {
     path:'login',
     component: LoginComponent
-  }
+  },
+  {path: '**', redirectTo:'/login', pathMatch:'full'}
 ];
 
 @NgModule({

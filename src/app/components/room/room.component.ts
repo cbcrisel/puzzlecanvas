@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { PuzzleService } from 'src/app/services/puzzle/puzzle.service';
 
 @Component({
@@ -10,7 +11,8 @@ import { PuzzleService } from 'src/app/services/puzzle/puzzle.service';
 export class RoomComponent implements OnInit {
   public files:any
   constructor(
-    private _puzzleService:PuzzleService
+    private _puzzleService:PuzzleService,
+    private router:Router
   ) { }
 
   ngOnInit(): void {
@@ -26,6 +28,7 @@ export class RoomComponent implements OnInit {
     this._puzzleService.postPuzzle(data).subscribe(
       Response=>{
         console.log(Response);
+        this.router.navigate(['/puzzle']);
       }
     )
   }

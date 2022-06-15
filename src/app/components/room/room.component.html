@@ -4,13 +4,12 @@
     <div class="row-2">
     <input (change)="upload($event)" type="file">
 </div>
-<!-- <div >
-    <button type="button" class="btn btn-success" (click)="uploadImg()" >Subir archivo</button>
- </div> -->
+
  <hr>
  <div class="controls">
     <form (ngSubmit)="uploadImg(forma)" #forma="ngForm">
-    <h3>Dificultad</h3> <select ngModel class="form-select" name="difficulty">
+    <h3>Dificultad</h3> <select ngModel class="form-select" name="difficulty" >
+            <option value="" disabled selected hidden>Seleccione la dificultad</option>
             <option value="easy">Facilito</option>
             <option value="medium">Medio</option>
             <option value="hard">Dificil</option>

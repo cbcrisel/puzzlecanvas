@@ -6,3 +6,22 @@
     width: 100%;
     overscroll-behavior: none;  
 }
+#center {
+    position: absolute;
+    margin: auto;
+    width: 50%;
+    border: 3px solid green;
+    padding: 10px;
+    text-align: center;
+    left: 50%;
+}
+
+#timer{
+    text-align: center;
+}
+.timerpos{
+    position: absolute;
+    top:0;
+    left:50%;
+    transform: translate(-50%);
+}

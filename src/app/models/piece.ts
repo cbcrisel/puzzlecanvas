@@ -175,10 +175,11 @@ export class Piece{
         }
         return false;
     }
-    snap(){
+    snap(audio:any){
         this.x=this.xCorrect;
         this.y=this.yCorrect;
         this.correct=true;
+        audio.play();
     }
     distance(p1:any,p2:any){
         return Math.sqrt(p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-p2.y);

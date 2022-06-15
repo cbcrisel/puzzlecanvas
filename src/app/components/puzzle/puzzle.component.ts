@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild, AfterViewInit, HostListener } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Piece } from 'src/app/models/piece';
 import { PuzzleService } from 'src/app/services/puzzle/puzzle.service';
+import { SocketsService } from 'src/app/services/websockets/sockets.service';
 
 @Component({
   selector: 'app-puzzle',
@@ -10,27 +12,45 @@ import { PuzzleService } from 'src/app/services/puzzle/puzzle.service';
 export class PuzzleComponent implements OnInit, AfterViewInit {
   @ViewChild('canvasRef',{static:false}) canvasRef: any;
 
+  room:string='';
   isRandom=false;
   imageObj = new Image();
+  audioObs = new Audio();
+  audioEnd = new Audio();
   imageName:any;
   scaler=0.7;
   photoURL='';
   size={x:0,y:0,width:0,height:0,rows:3,cols:3};
   pieces:any[]=[];
   selectedPiece:any;
+  timeLeft: number = 60;
+  interval:any;
   private context: any;
+  public hour:number=0;
+  public minute:number=0;
+  public second:number=0;
   constructor(
-    private _puzzleService:PuzzleService
+    private _puzzleService:PuzzleService,
+    public socketsService: SocketsService,
+    private router:ActivatedRoute
   ) {
     
-    //this.imageName='https://pm1.narvii.com/6365/8b690f9fc407f382b5ba09cc1a36d44398cae740_hq.jpg'
-    //this.imageName=`http://localhost:3000/public/uploads/file-1653576370481-128823015.jpg `
+    this.audioObs.src='../../../assets/pop.mp3';
+    this.audioObs.load();
+    this.audioEnd.src='../../../assets/completed.mp3';
+    this.audioEnd.load();
+    this.socketsService.listenServer().subscribe((Response:any)=>{
+      console.log(Response);
+       this.selectedPiece.x=Response.x;
+      this.selectedPiece.y=Response.y;  
+    })
    }
    
 
 
   ngOnInit(): void {
-     
+      /* this.room=this.router.snapshot.paramMap.get('puzzle')||'';
+      localStorage.setItem('room',this.room); */
   }
   ngAfterViewInit(): void {
     this.getPuzzleInfo();
@@ -42,6 +62,42 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     }
     
   }
+  startTimer() {
+    this.interval = setInterval(() => {
+      if(this.timeLeft > 0) {
+        this.timeLeft--;
+      } else {
+        this.timeLeft = 60;
+      }
+    },1000)
+  }
+
+  pauseTimer() {
+    clearInterval(this.interval);
+    console.log(this.interval)
+  }
+
+  setDifficulty(diff:String){
+    switch(diff){
+      case 'easy':
+        this.size.rows=3;
+        this.size.cols=3;
+        break;
+      case 'medium':
+        this.size.rows=5;
+        this.size.cols=5;
+        break;
+      case 'hard':
+        this.size.rows=7;
+        this.size.cols=7;
+        break;
+      case 'insane':
+        this.size.rows=11;
+        this.size.cols=11;
+        break;
+    }
+  }
+
   getPuzzleInfo(){
     this._puzzleService.getPuzzle().subscribe(
       Response=>{
@@ -52,7 +108,9 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         this.imageObj.src=this.imageName;
         console.log(this.imageObj);
         console.log(this.photoURL);
+        this.setDifficulty(Response.puzzle.difficulty);
         this.render();
+        
       }
     )
   }
@@ -71,8 +129,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     this.size.x=window.innerWidth/2-this.size.width/2;
     this.size.y=window.innerHeight/2-this.size.height/2;
 
-    this.initializePieces(3,3);
-    this.randomizePieces();
+    this.initializePieces();
+    //this.randomizePieces();
     
   }
 
@@ -87,14 +145,14 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     
     this.context.globalAlpha=1;
     for(let i=0;i<this.pieces.length;i++){
-      this.pieces[i].draw(this.context,this.imageObj,this.size,);
+      this.pieces[i].draw(this.context,this.imageObj,this.size);
     }
     window.requestAnimationFrame(() => this.drawImage() );    
   }
 
-  initializePieces(row:number, col:number){
-    this.size.rows=row;
-    this.size.cols=col;
+  initializePieces(){
+   /*  this.size.rows=row;
+    this.size.cols=col; */
     for(let i=0;i<this.size.rows;i++){
       for(let j=0;j<this.size.cols;j++){
         this.pieces.push(new Piece(i,j,this.size));
@@ -142,7 +200,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         
         
       }
-      console.log(this.pieces); 
+      //console.log(this.pieces); 
     }
     
 
@@ -190,9 +248,10 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       if(this.selectedPiece!=null){
         this.selectedPiece.x=e.x-this.selectedPiece.offsetX;
         this.selectedPiece.y=e.y-this.selectedPiece.offsetY;
-        console.log(this.selectedPiece.x);
+        this.socketsService.emit({x:this.selectedPiece.x, y:this.selectedPiece.y});
+        
       }
-    
+      
   }
   
 
@@ -200,8 +259,9 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   onMouseUp=(e: any) =>{
     if(this.selectedPiece!=null){
     if(this.selectedPiece.isClose()){
-      this.selectedPiece.snap();
+      this.selectedPiece.snap(this.audioObs);
       if(this.isComplete()){
+        this.audioEnd.play();
         alert('you ended it');
       }
     }

@@ -1,4 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Constants } from 'src/app/Constants';
+import { User } from 'src/app/models/user';
+import { UserService } from 'src/app/services/user/user.service';
+import { Utils } from 'src/app/Utils';
 
 @Component({
   selector: 'app-login',
@@ -6,10 +11,29 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-
-  constructor() { }
+  public user:User
+  constructor(
+    private router:Router,
+    private _userService:UserService
+  ) { 
+    this.user= new User('','');
+  }
 
   ngOnInit(): void {
   }
 
+  login(){
+    this._userService.login(this.user).subscribe(
+      Response=>{
+        console.log(Response);
+        Utils.set(Constants.ACTUAL_ACCESS_TOKEN, Response.token);
+        this.router.navigate(['/room']);
+        alert("Inicio de Sesion");
+      },
+      Error=>{
+        console.log(Error.error.msg);
+        alert(Error.error.msg);
+      }
+    )
+  }
 }
