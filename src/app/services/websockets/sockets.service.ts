@@ -38,4 +38,12 @@ export class SocketsService {
     return this.socket.fromEvent('event');
   }
 
+  listenServerSelectedPiece(){
+    return this.socket.fromEvent('selectedPiece');
+  }
+
+  emitPiece=(payload={})=>{
+    this.socket.emit('selectedPiece',payload);
+  }
+
 }

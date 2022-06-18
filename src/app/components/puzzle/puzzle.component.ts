@@ -39,11 +39,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     this.audioObs.load();
     this.audioEnd.src='../../../assets/completed.mp3';
     this.audioEnd.load();
-    this.socketsService.listenServer().subscribe((Response:any)=>{
-      console.log(Response);
-       this.selectedPiece.x=Response.x;
-      this.selectedPiece.y=Response.y;  
-    })
+    
    }
    
 
@@ -53,13 +49,18 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       localStorage.setItem('room',this.room); */
   }
   ngAfterViewInit(): void {
+    
     this.getPuzzleInfo();
-    
-    
-   
+
+
     this.imageObj.onload = () => {
+      this.render();
       this.drawImage();
     }
+
+    
+    this.getData();
+    
     
   }
   startTimer() {
@@ -106,10 +107,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         this.photoURL=srt.replace(/\\/g, "/");
         this.imageName=this.photoURL;
         this.imageObj.src=this.imageName;
-        console.log(this.imageObj);
-        console.log(this.photoURL);
         this.setDifficulty(Response.puzzle.difficulty);
-        this.render();
         
       }
     )
@@ -121,8 +119,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     canvasElement.width = window.innerWidth;
     canvasElement.height = window.innerHeight;
     //this.imageObj.src = this.imageName;
-    console.log(this.imageObj);
-    console.log(this.photoURL);
     let reziser=this.scaler*Math.min(window.innerWidth/this.imageObj.width,window.innerHeight/this.imageObj.height);
     this.size.width=reziser*this.imageObj.width;
     this.size.height=reziser*this.imageObj.height;
@@ -130,7 +126,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     this.size.y=window.innerHeight/2-this.size.height/2;
 
     this.initializePieces();
-    //this.randomizePieces();
+    this.randomizePieces();
     
   }
 
@@ -225,6 +221,32 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   }
   
 
+  getData(){
+    this.socketsService.listenServerSelectedPiece().subscribe((Response:any)=>{
+      this.selectedPiece=Response;
+      console.log("hola",this.selectedPiece);
+     
+    })
+    this.socketsService.listenServer().subscribe((Response:any)=>{
+      
+      console.log(Response);
+     
+      this.selectedPiece.x=Response.x;
+      this.selectedPiece.y=Response.y;
+      this.pieces.forEach(element => {
+        if(element.colIndex==this.selectedPiece.colIndex && element.rowIndex==this.selectedPiece.rowIndex){
+          element.x=Response.x;
+          element.y=Response.y;
+          if(element.isClose()){
+            element.snap(this.audioObs);
+          }
+        }
+      });  
+    })
+  }
+
+
+
 
   @HostListener('mousedown', ['$event'])
   onMouseDown=(e: any) =>{
@@ -240,6 +262,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         this.selectedPiece.correct=false;
       }
       console.log(this.selectedPiece);
+      this.socketsService.emitPiece(this.selectedPiece);
   }
   
 
@@ -248,7 +271,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       if(this.selectedPiece!=null){
         this.selectedPiece.x=e.x-this.selectedPiece.offsetX;
         this.selectedPiece.y=e.y-this.selectedPiece.offsetY;
-        this.socketsService.emit({x:this.selectedPiece.x, y:this.selectedPiece.y});
+        this.socketsService.emit(this.selectedPiece);
         
       }
       
@@ -300,6 +323,9 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   onTouchEnd=(e: any) =>{
     this.onMouseUp(e);
   }
+
+
+
 
 
 }

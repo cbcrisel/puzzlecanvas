@@ -4,7 +4,7 @@ import {HttpClientModule} from '@angular/common/http';
 
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
-const config: SocketIoConfig = { url: 'http://localhost:3000', options: {
+const config: SocketIoConfig = { url: environment.server_url, options: {
   query:{
   
     nameRoom:localStorage.getItem('room')
@@ -20,6 +20,8 @@ import { HomeComponent } from './components/home/home.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { RoomComponent } from './components/room/room.component';
 import { FormsModule } from '@angular/forms';
+import { RegisterComponent } from './components/register/register.component';
+import { environment } from 'src/environments/environment';
 
 @NgModule({
   declarations: [
@@ -28,7 +30,8 @@ import { FormsModule } from '@angular/forms';
     LoginComponent,
     HomeComponent,
     NavbarComponent,
-    RoomComponent
+    RoomComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule,

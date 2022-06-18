@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  server_url: 'https://puzzle-backend-sw1.herokuapp.com' 
 };

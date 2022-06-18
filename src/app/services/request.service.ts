@@ -3,6 +3,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { Constants } from '../Constants';
 import {Observable} from 'rxjs';
 import { Utils } from '../Utils';
+import { environment } from 'src/environments/environment';
 
 
 @Injectable({
@@ -10,7 +11,7 @@ import { Utils } from '../Utils';
 })
 export class RequestService {
   private headers= new HttpHeaders;
-  private url='http://localhost:3000/api/';
+  private url=environment.server_url+'/api/';
 
   constructor(private _http:HttpClient) { 
 
