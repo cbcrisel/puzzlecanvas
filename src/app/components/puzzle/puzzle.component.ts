@@ -229,21 +229,24 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
      
     })
     this.socketsService.listenServer().subscribe((Response:any)=>{
-      
-      console.log(Response);
+      if(this.selectedPiece!=null){
+        console.log(Response);
      
-      this.selectedPiece.x=Response.x;
-      this.selectedPiece.y=Response.y;
-      this.pieces.forEach(element => {
-        if(element.colIndex==this.selectedPiece.colIndex && element.rowIndex==this.selectedPiece.rowIndex){
-          element.x=Response.x;
-          element.y=Response.y;
-          if(element.isClose()){
-            element.snap(this.audioObs);
+        this.selectedPiece.x=Response.x;
+        this.selectedPiece.y=Response.y;
+        this.pieces.forEach(element => {
+          if(element.colIndex==this.selectedPiece.colIndex && element.rowIndex==this.selectedPiece.rowIndex){
+            element.x=Response.x;
+            element.y=Response.y;
+            if(element.isClose()){
+              element.snap(this.audioObs);
+            }
           }
-        }
-      });  
+        });  
+      }
+      
     })
+    
   }
 
 
