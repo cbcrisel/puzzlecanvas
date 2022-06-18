@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Piece } from 'src/app/models/piece';
 import { PuzzleService } from 'src/app/services/puzzle/puzzle.service';
 import { SocketsService } from 'src/app/services/websockets/sockets.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-puzzle',
@@ -103,7 +104,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     this._puzzleService.getPuzzle().subscribe(
       Response=>{
         //console.log(Response.puzzle);
-        let srt='http://localhost:3000/'+Response.puzzle.image;
+        let srt=environment.server_url+'/'+Response.puzzle.image;
         this.photoURL=srt.replace(/\\/g, "/");
         this.imageName=this.photoURL;
         this.imageObj.src=this.imageName;
