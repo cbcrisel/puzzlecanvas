@@ -16,7 +16,7 @@ export class PuzzleService {
   postPuzzle(formData:any) :Observable<any>{
     return this._requestService.post('puzzle',formData);
   }
-  getPuzzle(): Observable<any>{
-    return this._requestService.get('lastPuzzle');
+  getPuzzle(room:any): Observable<any>{
+    return this._requestService.get('lastPuzzle/'+room);
   }
 }

@@ -1,8 +1,10 @@
 import { Component, OnInit, ViewChild, AfterViewInit, HostListener } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Constants } from 'src/app/Constants';
 import { Piece } from 'src/app/models/piece';
 import { PuzzleService } from 'src/app/services/puzzle/puzzle.service';
 import { SocketsService } from 'src/app/services/websockets/sockets.service';
+import { Utils } from 'src/app/Utils';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -19,21 +21,29 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   audioObs = new Audio();
   audioEnd = new Audio();
   imageName:any;
-  scaler=0.7;
+  scaler=0.6;
   photoURL='';
+  width=1000;
+  height=657;
   size={x:0,y:0,width:0,height:0,rows:3,cols:3};
   pieces:any[]=[];
   selectedPiece:any;
   timeLeft: number = 60;
   interval:any;
   private context: any;
-  public hour:number=0;
-  public minute:number=0;
-  public second:number=0;
+  public hour:any;
+  public startHour:any;
+  public startMinute:any;
+  public startSecond:any;
+  public minute:any;
+  public second:any;
+  public timeFinishedGame: any;
+  public startTime: any;
+  public endTime: any;
   constructor(
     private _puzzleService:PuzzleService,
     public socketsService: SocketsService,
-    private router:ActivatedRoute
+    private route:ActivatedRoute
   ) {
     
     this.audioObs.src='../../../assets/pop.mp3';
@@ -44,27 +54,61 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
    }
    
 
-
   ngOnInit(): void {
-      /* this.room=this.router.snapshot.paramMap.get('puzzle')||'';
-      localStorage.setItem('room',this.room); */
+      this.route.paramMap.subscribe((paramMap:any) => {
+        const { params } = paramMap
+        this.room=params.game;
+      });
+      //console.log(this.room);
   }
   ngAfterViewInit(): void {
-    
+    /* console.log("WINDOW HEIGHT: "+window.innerHeight);
+    console.log("WINDOW WIDTH: "+window.innerWidth); */
     this.getPuzzleInfo();
 
-
+    
     this.imageObj.onload = () => {
       this.render();
       this.drawImage();
+      
     }
-
+    
     
     this.getData();
-    
+    this.usuario();
     
   }
-  startTimer() {
+
+  usuario(){
+    this.socketsService.loginWS(Utils.get(Constants.ACTUAL_USER)??'Jugador X');
+  }
+  updateDate(date: Date){
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    /* console.log(hours);
+    console.log(minutes);
+    console.log(seconds); */
+
+
+
+
+    this.hour = hours % 24; //Makes the hour in 12 hours format.
+    this.hour = this.hour ? this.hour : 24; // if the hour is 0 then 24 is assigned to it.
+
+    this.hour = this.hour < 10 ? '0' + this.hour : this.hour;// hour with single digit, add 0 in front of it
+
+    this.minute = minutes < 10 ? '0' + minutes : minutes.toString();
+
+    this.second = seconds < 10 ? '0' + seconds : seconds.toString();
+
+  }
+  pauseTimeLine() {
+    clearInterval(this.interval);
+  }
+  
+
+  /* startTimer() {
     this.interval = setInterval(() => {
       if(this.timeLeft > 0) {
         this.timeLeft--;
@@ -77,7 +121,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   pauseTimer() {
     clearInterval(this.interval);
     console.log(this.interval)
-  }
+  } */
 
   setDifficulty(diff:String){
     switch(diff){
@@ -101,9 +145,9 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   }
 
   getPuzzleInfo(){
-    this._puzzleService.getPuzzle().subscribe(
+    this._puzzleService.getPuzzle(this.room).subscribe(
       Response=>{
-        //console.log(Response.puzzle);
+        //console.log(Response);
         let srt=environment.server_url+'/'+Response.puzzle.image;
         this.photoURL=srt.replace(/\\/g, "/");
         this.imageName=this.photoURL;
@@ -117,23 +161,47 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   private render():any{
     const canvasElement= this.canvasRef.nativeElement;
     this.context = canvasElement.getContext('2d');
-    canvasElement.width = window.innerWidth;
-    canvasElement.height = window.innerHeight;
+   /*  canvasElement.width = window.innerWidth;
+    canvasElement.height = window.innerHeight; */
+    canvasElement.width=this.width;
+    canvasElement.height=this.height;
     //this.imageObj.src = this.imageName;
-    let reziser=this.scaler*Math.min(window.innerWidth/this.imageObj.width,window.innerHeight/this.imageObj.height);
+    //let reziser=this.scaler*Math.min(window.innerWidth/this.imageObj.width,window.innerHeight/this.imageObj.height);
+    let reziser=this.scaler*Math.min(canvasElement.width/this.imageObj.width,canvasElement.height/this.imageObj.height)
     this.size.width=reziser*this.imageObj.width;
     this.size.height=reziser*this.imageObj.height;
-    this.size.x=window.innerWidth/2-this.size.width/2;
-    this.size.y=window.innerHeight/2-this.size.height/2;
-
+    /* this.size.x=window.innerWidth/2-this.size.width/2;
+    this.size.y=window.innerHeight/2-this.size.height/2; */
+    this.size.x=canvasElement.width/2-this.size.width/2;
+    this.size.y=canvasElement.height/2-this.size.height/2;
+    /* console.log("hola",this.size);
+    console.log("chau",canvasElement); */
     this.initializePieces();
+
+
+    //this.start_time = new Date().getTime();
+    this.timeFinishedGame = null;
+    this.startHour = new Date().getHours();
+    this.startMinute = new Date().getMinutes();
+    this.startSecond = new Date().getSeconds();
+    /* const time = new Date().getTime();
+    this.start_time = this.formatTime(time); */
+
+    this.startTime = ((this.startHour).toString() + ":" + (this.startMinute).toString() + ":" + (this.startSecond + 1));
+    this.interval = setInterval(() => {
+      const date = new Date();
+      this.updateDate(date);
+    }, 1000);
+
+
+
     this.randomizePieces();
     
   }
 
   drawImage(){
-    this.context.clearRect(0,0,window.innerWidth,window.innerHeight);
-    
+    //this.context.clearRect(0,0,window.innerWidth,window.innerHeight);
+    this.context.clearRect(0,0,this.width,this.height);
 
       this.context.globalAlpha=0.3;
       this.context.drawImage(this.imageObj,this.size.x,this.size.y,this.size.width,this.size.height);
@@ -204,8 +272,10 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   randomizePieces(){
     for(let i=0;i<this.pieces.length;i++){
       let loc={
-        x:Math.random()*(window.innerWidth-this.pieces[i].width),
-        y:Math.random()*(window.innerHeight-this.pieces[i].height)
+       /*  x:Math.random()*(window.innerWidth-this.pieces[i].width),
+        y:Math.random()*(window.innerHeight-this.pieces[i].height) */
+        x:Math.random()*(this.width-this.pieces[i].width),
+        y:Math.random()*(this.height-this.pieces[i].height)
       }
       this.pieces[i].x=loc.x;
       this.pieces[i].y=loc.y;
@@ -225,12 +295,12 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   getData(){
     this.socketsService.listenServerSelectedPiece().subscribe((Response:any)=>{
       this.selectedPiece=Response;
-      console.log("hola",this.selectedPiece);
+      //console.log("hola",this.selectedPiece);
      
     })
     this.socketsService.listenServer().subscribe((Response:any)=>{
       if(this.selectedPiece!=null){
-        console.log(Response);
+        //console.log(Response);
      
         this.selectedPiece.x=Response.x;
         this.selectedPiece.y=Response.y;
@@ -265,7 +335,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         this.selectedPiece.offsetY=e.y-this.selectedPiece.y;
         this.selectedPiece.correct=false;
       }
-      console.log(this.selectedPiece);
+      //console.log(this.selectedPiece);
       this.socketsService.emitPiece(this.selectedPiece);
   }
   
@@ -287,9 +357,13 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     if(this.selectedPiece!=null){
     if(this.selectedPiece.isClose()){
       this.selectedPiece.snap(this.audioObs);
-      if(this.isComplete()){
+      if(this.isComplete() && this.timeFinishedGame==null){
+        this.getTheTotalTime();
         this.audioEnd.play();
-        alert('you ended it');
+        setTimeout(() => {
+          alert('you ended it in: '+ this.timeFinishedGame );
+        }, 500);
+        
       }
     }
     this.selectedPiece=null;
@@ -329,7 +403,40 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   }
 
 
+  getTheTotalTime(){
+    let nowHour = new Date().getHours();
+    let nowMinute = new Date().getMinutes();
+    let nowSecond = new Date().getSeconds();
 
+    this.endTime = ((nowHour).toString() + ":" + (nowMinute).toString() + ":" + (nowSecond));
+    //this.end_time = this.formatTime(new Date().getTime());
+    //this.time_finished_game = ((this.end_time - this.start_time));
+
+    let c = ((nowHour * 3600 + nowMinute * 60 + nowSecond) - (this.startHour * 3600 + this.startMinute * 60 + this.startSecond)) - 1;
+
+    const hours = c / 3600;
+
+    c = c % 3600;
+
+    const minutes = c / 60;
+
+    c = c % 60;
+
+    const seconds = c;
+
+
+    /* console.log(Math.trunc(hours));
+    console.log(Math.trunc(minutes));
+    console.log(seconds);
+ */
+
+    this.timeFinishedGame = ((Math.trunc(hours)).toString() + " Horas " + (Math.trunc(minutes)).toString() + " Minutos " + ((seconds)) + " Segundos");
+
+    this.pauseTimeLine();
+    /* console.log(this.startTime);
+    console.log(this.endTime);
+    console.log(this.timeFinishedGame); */
+  }
 
 
 }

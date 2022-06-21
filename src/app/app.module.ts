@@ -22,6 +22,7 @@ import { RoomComponent } from './components/room/room.component';
 import { FormsModule } from '@angular/forms';
 import { RegisterComponent } from './components/register/register.component';
 import { environment } from 'src/environments/environment';
+import { GameComponent } from './components/game/game.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { environment } from 'src/environments/environment';
     HomeComponent,
     NavbarComponent,
     RoomComponent,
-    RegisterComponent
+    RegisterComponent,
+    GameComponent
   ],
   imports: [
     BrowserModule,

@@ -27,6 +27,7 @@ export class LoginComponent implements OnInit {
       Response=>{
         console.log(Response);
         Utils.set(Constants.ACTUAL_ACCESS_TOKEN, Response.token);
+        Utils.set(Constants.ACTUAL_USER, Response.user.email);
         this.router.navigate(['/room']);
         alert("Inicio de Sesion");
       },

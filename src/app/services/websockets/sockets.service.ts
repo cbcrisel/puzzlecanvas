@@ -46,4 +46,9 @@ export class SocketsService {
     this.socket.emit('selectedPiece',payload);
   }
 
+  loginWS(name:string){
+    console.log('Configurando', name);
+    this.socket.emit('configurar-usuario',{name});
+  }
+
 }
