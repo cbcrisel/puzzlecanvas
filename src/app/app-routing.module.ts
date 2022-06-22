@@ -6,11 +6,13 @@ import { LoginComponent } from './components/login/login.component';
 import { PuzzleComponent } from './components/puzzle/puzzle.component';
 import { RegisterComponent } from './components/register/register.component';
 import { RoomComponent } from './components/room/room.component';
+import { UserGuardGuard } from './guards/user-guard.guard';
 
 const routes: Routes = [
   {
     path: 'puzzle',
-    component: PuzzleComponent
+    component: PuzzleComponent,
+    canActivate:[UserGuardGuard]
   },
   {
     path: '',
@@ -23,7 +25,8 @@ const routes: Routes = [
   },
   {
     path:'room',
-    component: RoomComponent
+    component: RoomComponent,
+    canActivate:[UserGuardGuard]
   },
   {
     path:'login',
@@ -35,7 +38,8 @@ const routes: Routes = [
   },
   {
     path:':game',
-    component: GameComponent
+    component: GameComponent,
+    canActivate:[UserGuardGuard]
   }  
 ];
 

@@ -78,6 +78,13 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     this.usuario();
     
   }
+  start(){
+    this.randomizePieces();
+    this.interval = setInterval(() => {
+      const date = new Date();
+      this.updateDate(date);
+    }, 1000);
+  }
 
   usuario(){
     this.socketsService.loginWS(Utils.get(Constants.ACTUAL_USER)??'Jugador X');
@@ -188,10 +195,10 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     this.start_time = this.formatTime(time); */
 
     this.startTime = ((this.startHour).toString() + ":" + (this.startMinute).toString() + ":" + (this.startSecond + 1));
-    this.interval = setInterval(() => {
+     this.interval = setInterval(() => {
       const date = new Date();
       this.updateDate(date);
-    }, 1000);
+    }, 1000); 
 
 
 

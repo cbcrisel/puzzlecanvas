@@ -17,5 +17,9 @@ export class UserService {
     return this._requestService.post('login',user);
   }
 
+  postUser(form:any):Observable<any>{
+    return this._requestService.post('newUser',form)
+  }
+
 }
 

@@ -1,6 +1,12 @@
 <div class="container">
     <form >
         <div class="form-group">
+            <form (ngSubmit)="createUser(forma)" #forma="ngForm">
+                
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Nombre</label>
+                <input ngModel name="name" type="email" class="form-control"  placeholder="Introduzca su email" autocomplete="off">
+              </div>
             <div class="mb-3">
                 <label for="exampleFormControlInput1" class="form-label">Email</label>
                 <input ngModel name="email" type="email" class="form-control"  placeholder="Introduzca su email">
@@ -11,9 +17,10 @@
               </div>
               <div class="container-login100-form-btn m-t-17">
                 <button  routerLinkActive="router-link-active"  class="login100-form-btn" type="submit">
-                    Ingresar
+                    Guardar
                 </button>
             </div>
+        </form> 
         </div>
     </form>
 </div>
