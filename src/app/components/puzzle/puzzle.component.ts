@@ -64,6 +64,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     /* console.log("WINDOW HEIGHT: "+window.innerHeight);
     console.log("WINDOW WIDTH: "+window.innerWidth); */
+    //this.usuario();
     this.getPuzzleInfo();
 
     
@@ -75,8 +76,26 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     
     
     this.getData();
-    this.usuario();
-    
+    this.socketsService.listenStart().subscribe(
+      Response=>{
+        console.log('START FOR EVERYONE');
+        this.randomizePieces();
+        this.interval = setInterval(() => {
+          const date = new Date();
+          this.updateDate(date);
+        }, 1000);
+      }
+    )
+    this.socketsService.listenEnd().subscribe(
+      (Response:any)=>{
+        console.log(Response)
+        this.timeFinishedGame=Response
+        this.audioEnd.play();
+        setTimeout(() => {
+          alert('Puzzle terminado en: '+ this.timeFinishedGame );
+        }, 500);
+      }
+    )
   }
   start(){
     this.randomizePieces();
@@ -84,11 +103,12 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       const date = new Date();
       this.updateDate(date);
     }, 1000);
+    this.socketsService.emitStart();
   }
 
-  usuario(){
+  /* usuario(){
     this.socketsService.loginWS(Utils.get(Constants.ACTUAL_USER)??'Jugador X');
-  }
+  } */
   updateDate(date: Date){
     const hours = date.getHours();
     const minutes = date.getMinutes();
@@ -195,14 +215,14 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     this.start_time = this.formatTime(time); */
 
     this.startTime = ((this.startHour).toString() + ":" + (this.startMinute).toString() + ":" + (this.startSecond + 1));
-     this.interval = setInterval(() => {
+    /*  this.interval = setInterval(() => {
       const date = new Date();
       this.updateDate(date);
     }, 1000); 
 
 
 
-    this.randomizePieces();
+    this.randomizePieces(); */
     
   }
 
@@ -367,16 +387,18 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       if(this.isComplete() && this.timeFinishedGame==null){
         this.getTheTotalTime();
         this.audioEnd.play();
-        setTimeout(() => {
-          alert('you ended it in: '+ this.timeFinishedGame );
-        }, 500);
         
+        setTimeout(() => {
+          alert('Puzzle terminado en: '+ this.timeFinishedGame );
+        }, 500);
+        console.log('jiji')
+        this.socketsService.emitEnd(this.timeFinishedGame);
       }
+      
     }
     this.selectedPiece=null;
     }
   }
-
 
   getPressedPiece(e:MouseEvent){
     for (let i=this.pieces.length-1;i>=0;i--){

@@ -23,6 +23,7 @@ import { FormsModule } from '@angular/forms';
 import { RegisterComponent } from './components/register/register.component';
 import { environment } from 'src/environments/environment';
 import { GameComponent } from './components/game/game.component';
+import { UsersListComponent } from './components/users-list/users-list.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { GameComponent } from './components/game/game.component';
     NavbarComponent,
     RoomComponent,
     RegisterComponent,
-    GameComponent
+    GameComponent,
+    UsersListComponent
   ],
   imports: [
     BrowserModule,

@@ -20,10 +20,10 @@ export class SocketsService {
       console.log('Conectado al servidor');
       this.socketStatus = true;
     });
-    this.socket.on('disconnect', () => {
+    /* this.socket.on('disconnect', () => {
       console.log('Desconectado del servidor');
       this.socketStatus = false;
-    });
+    }); */
   }
 
   emit=(payload={})=>{
@@ -47,8 +47,26 @@ export class SocketsService {
   }
 
   loginWS(name:string){
-    console.log('Configurando', name);
+    //console.log('Configurando', name);
     this.socket.emit('configurar-usuario',{name});
+  }
+
+  listenUser(){
+    return this.socket.fromEvent('usuarios-activos');
+  }
+
+  emitStart=()=>{
+    this.socket.emit('start')
+  }
+  listenStart(){
+    return this.socket.fromEvent('start');
+  }
+
+  emitEnd=(payload={})=>{
+    this.socket.emit('end',payload);
+  }
+  listenEnd(){
+    return this.socket.fromEvent('end')
   }
 
 }

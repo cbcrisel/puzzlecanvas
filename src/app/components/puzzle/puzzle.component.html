@@ -2,5 +2,21 @@
 <div class="timerpos">
       {{hour}}:{{minute}}:{{second}}
 </div>
-<canvas class="canvasR" id="myCanvas" #canvasRef>
-</canvas>
+<div class="row">
+<div class="col">
+      <canvas class="canvasR" id="myCanvas" #canvasRef>
+      </canvas>
+</div>
+
+
+
+
+
+<div class="col">
+      <div>
+            <button class="btn btn-success mt-2" (click)="start()">EMPEZAR JUEGO</button>
+      </div>
+      <app-users-list></app-users-list>
+      
+</div>
+</div>
